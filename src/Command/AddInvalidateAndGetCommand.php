@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Command;
 
 
@@ -10,7 +9,7 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CacheInvalidateAndFetchOnASingleCallCommand extends ContainerAwareCommand
+class AddInvalidateAndGetCommand extends ContainerAwareCommand
 {
     /**
      * @var TagAwareAdapterInterface
@@ -20,8 +19,7 @@ class CacheInvalidateAndFetchOnASingleCallCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('app:single-flow')
-            ->setDescription('Populates, invalidates by tag and returns tagged cases');
+            ->setName('app:add-invalidate-and-get');
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output)
@@ -43,21 +41,12 @@ class CacheInvalidateAndFetchOnASingleCallCommand extends ContainerAwareCommand
             $this->cachePool->save($cacheItem);
         }
 
-        $output->writeln("Check that all the items are saved properly");
-        for ($i = 0; $i < $howMany; $i++) {
-            $cacheItem = $this->cachePool->getItem("item-$i");
-            $hit = $cacheItem->isHit()?'true':'false';
-            $output->writeln("{$cacheItem->getKey()}, isHit:{$hit}");
-        }
         $this->cachePool->invalidateTags(['to_be_deleted']);
 
-
-        $output->writeln("Check that all the items are cleared properly");
         for ($i = 0; $i < $howMany; $i++) {
             $cacheItem = $this->cachePool->getItem("item-$i");
             $hit = $cacheItem->isHit()?'true':'false';
             $output->writeln("{$cacheItem->getKey()}, isHit:{$hit}");
         }
-
     }
 }

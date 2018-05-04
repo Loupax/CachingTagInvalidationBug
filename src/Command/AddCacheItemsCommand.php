@@ -10,7 +10,7 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class GetAllCacheItemsCommand extends ContainerAwareCommand
+class AddCacheItemsCommand extends ContainerAwareCommand
 {
     /**
      * @var TagAwareAdapterInterface
@@ -20,7 +20,7 @@ class GetAllCacheItemsCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('app:get');
+            ->setName('app:add');
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output)
@@ -35,12 +35,11 @@ class GetAllCacheItemsCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $howMany = 5;
-
+        // Populate...
         for ($i = 0; $i < $howMany; $i++) {
             $cacheItem = $this->cachePool->getItem("item-$i");
-            $hit = $cacheItem->isHit()?'true':'false';
-            $output->writeln("{$cacheItem->getKey()}, isHit:{$hit}");
+            $cacheItem->tag(['to_be_deleted']);
+            $this->cachePool->save($cacheItem);
         }
-
     }
 }
